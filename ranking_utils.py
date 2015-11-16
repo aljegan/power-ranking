@@ -1,11 +1,7 @@
 from numpy import log, sqrt, pi
-import json
-import gspread
-from oauth2client.client import SignedJwtAssertionCredentials
 
 DEFAULT_RATING = 1500
 DEFAULT_RD = 350
-
 q = log(10)/400
 
 def g(RD):
@@ -14,7 +10,6 @@ def g(RD):
 def E_s(r, r_j, RD_j):
     exponent =-1*g(RD_j)*(r-r_j)/float(400)
     return float(1)/(1+10**exponent)
-
 
 class Competitor(object):
     
@@ -60,6 +55,7 @@ class Competitor(object):
     def update(self, new_r, new_RD):
         self.rating = new_r
         self.RD = new_RD
+
 
 class Match(object):
     def __init__(self, day, player1, player2, winner):
@@ -122,34 +118,8 @@ class RatingPeriod(object):
             new_r, new_RD = self.competitors[c]['Competitor'].updated_metrics(
                                 self.competitors[c]['matches'],
                                 self.competitors[c]['results'])
-            self.competitors[c]['new_metrics'] = Competitor(c, new_r, new_RD)        
-    
-#json_key = json.load(open('/Users/alexegan1/Documents/python/power_ranking/power-rankings-3152e30f4b4b.json'))
-#scope = ['https://spreadsheets.google.com/feeds']
-#credentials = SignedJwtAssertionCredentials(json_key['client_email'], json_key['private_key'].encode(), scope)
-#
-#gc = gspread.authorize(credentials)
-#
-#book = gc.open('Power_Ranking')
-#
-#results = book.worksheet('Results')
-#archived_results = book.worksheet('Archived Results') 
-##results.insert_row(['11/10/2015', 'Alpha', 'Charlie', 'Alpha'], index = 10)
-##print results.get_all_records()
-#new_results = results.get_all_records()
-#for result in new_results:
-#    archived_results.insert_row([result['Date'], result['Player1'], result['Player2'], result['Winner']], index = 2)
-#print results.row_count
-#print len(new_results)
-#
-#
-#cell_list = results.range('A2:D{0}'.format(len(new_results)+1))
-#for i,val in enumerate(cell_list):
-#    cell_list[i].value = ""
-#results.update_cells(cell_list)
+            self.competitors[c]['new_metrics'] = Competitor(c, new_r, new_RD)
 
-import sys
-#sys.exit(0)
 
 if __name__ == "__main__":
     other_1 = Competitor('Alice',1400,30)
@@ -159,9 +129,6 @@ if __name__ == "__main__":
     match1 = Match('foo', other_1, player0, player0)
     match2 = Match('bar', other_2, player0, other_2)
     match3 = Match('baz', other_3, player0, other_3)
-    #for m in [match1, match2, match3]:
-    #    o, r = m.get_match_data('Dana')
-    #    print 'other: {0}, result: {1}'.format(o.name, r)
     
     rp = RatingPeriod()
     for comp in [other_1, other_2, other_3, player0]:
