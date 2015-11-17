@@ -20,6 +20,9 @@ def wipe(sheet):
             cell_list[i].value = ""
         sheet.update_cells(cell_list)
 
+def move_ratings_data(current, archive):
+    for item in current.get_all_records():
+        archive.insert_row([item['Date'], item['Player1'], item['Player2'], item['Winner']], index = 2)
 
 if __name__ == "__main__":
     json_key = json.load(open('/Users/alexegan1/Documents/python/power_ranking/power-rankings-3152e30f4b4b.json'))
@@ -51,6 +54,8 @@ if __name__ == "__main__":
     wipe(competitors_sheet)
     for c in sort_competitors([rp.competitors[k]['new_metrics'] for k in rp.competitors.keys()]):
         competitors_sheet.insert_row([c.name, c.rating, c.RD, c.last_updated], index = 2)
+    move_ratings_data(results_sheet, book.worksheet('Archived Results'))
+    wipe(results_sheet)
     
 #
 #results = book.worksheet('Results')
