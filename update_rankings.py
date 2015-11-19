@@ -2,6 +2,11 @@ import json
 import gspread
 from oauth2client.client import SignedJwtAssertionCredentials
 from ranking_utils import Competitor, Match, RatingPeriod
+from datetime import datetime
+from pytz import timezone
+
+tz_pacific = timezone('US/Pacific')
+tz_utc = timezone('UTC')
 
 def length_to_letter(n):
     return chr(n + ord('A') - 1)
@@ -36,7 +41,9 @@ if __name__ == "__main__":
     competitors = [Competitor(name = c['Player'],
                                 r = c['Rating'],
                                 rd = c['RD'],
-                                last_updated = c['Last-Played']) 
+                                last_updated = tz_pacific.localize(
+                                    datetime.strptime(c['Last-Played'], '%m/%d/%Y')
+                                    )) 
                                 for c in competitors]
     for c in competitors:
         rp.add_competitor(c)
@@ -49,10 +56,12 @@ if __name__ == "__main__":
         p1 = rp.competitors[p1]['Competitor']
         p2 = rp.competitors[p2]['Competitor']
         w = rp.competitors[w]['Competitor']
-        rp.add_match(Match(mtch['Date'], p1, p2, w))
+        mtch_date = tz_pacific.localize(datetime.strptime(mtch['Date'], '%m/%d/%Y'))
+        rp.add_match(Match(mtch_date, p1, p2, w))
     rp.make_new_rankings()
     wipe(competitors_sheet)
     for c in sort_competitors([rp.competitors[k]['new_metrics'] for k in rp.competitors.keys()]):
+        print c, '\n'
         competitors_sheet.insert_row([c.name, c.rating, c.RD, c.last_updated], index = 2)
     move_ratings_data(results_sheet, book.worksheet('Archived Results'))
     wipe(results_sheet)
