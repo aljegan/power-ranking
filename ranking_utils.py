@@ -60,10 +60,10 @@ class Competitor(object):
             d2 = self._dsq(others)
             new_r = self._updated_rating(others, results, d2)
             new_RD = self._updated_RD(d2)
-            new_last_updated = max(self.last_updated,max(dates))
+            new_last_updated = max(self.last_updated,max(dates)) if dates else self.last_updated
             return new_r, new_RD, new_last_updated
         else:
-            return self.rating, self.RD
+            return self.rating, self.RD, self.last_updated
     
     def update(self, new_r, new_RD):
         self.rating = new_r
@@ -136,7 +136,6 @@ class RatingPeriod(object):
                                 self.competitors[c]['dates'])
             new_competitor = Competitor(c, new_r, new_RD, new_last_updated)
             self.competitors[c]['new_metrics'] = new_competitor
-            print new_competitor
 
 
 if __name__ == "__main__":

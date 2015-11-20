@@ -30,7 +30,7 @@ def move_ratings_data(current, archive):
         archive.insert_row([item['Date'], item['Player1'], item['Player2'], item['Winner']], index = 2)
 
 if __name__ == "__main__":
-    json_key = json.load(open('/Users/alexegan1/Documents/python/power_ranking/power-rankings-3152e30f4b4b.json'))
+    json_key = json.load(open('power-rankings-3152e30f4b4b.json'))
     scope = ['https://spreadsheets.google.com/feeds']
     credentials = SignedJwtAssertionCredentials(json_key['client_email'], json_key['private_key'].encode(), scope)
     gc = gspread.authorize(credentials)
@@ -58,11 +58,18 @@ if __name__ == "__main__":
         w = rp.competitors[w]['Competitor']
         mtch_date = tz_pacific.localize(datetime.strptime(mtch['Date'], '%m/%d/%Y'))
         rp.add_match(Match(mtch_date, p1, p2, w))
+    # rp._apply_results()
+    # for c in rp.competitors.itervalues():
+        # print c['Competitor']
+        # print c['Competitor'].updated_metrics(c['matches'], c['results'], c['dates']), '\n'
+    # import sys
+    # sys.exit(0)
     rp.make_new_rankings()
     wipe(competitors_sheet)
     for c in sort_competitors([rp.competitors[k]['new_metrics'] for k in rp.competitors.keys()]):
-        print c, '\n'
-        competitors_sheet.insert_row([c.name, c.rating, c.RD, c.last_updated], index = 2)
+        print c
+        competitors_sheet.insert_row([c.name, c.rating, c.RD, c.last_updated.strftime('%m/%d/%Y')], index = 2)
+        # print [c.name, c.rating, c.RD, c.last_updated.strftime('%m/%d/%Y')], '\n'
     move_ratings_data(results_sheet, book.worksheet('Archived Results'))
     wipe(results_sheet)
     
