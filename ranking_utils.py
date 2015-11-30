@@ -56,12 +56,12 @@ class Competitor(object):
         return max(min(new_RD,350),30)
     
     def updated_metrics(self, others, results, dates):
+        self.last_updated = max(self.last_updated,max(dates)) if dates else self.last_updated
         if others:
             d2 = self._dsq(others)
             new_r = self._updated_rating(others, results, d2)
             new_RD = self._updated_RD(d2)
-            new_last_updated = max(self.last_updated,max(dates)) if dates else self.last_updated
-            return new_r, new_RD, new_last_updated
+            return new_r, new_RD, self.last_updated
         else:
             return self.rating, self.RD, self.last_updated
     
